@@ -1,24 +1,19 @@
-#include <example.hpp>
-
-#include <string>
+#include <PageContainer.hpp>
+#include <Parser.hpp>
 
 int main(int argc, char* argv[]) {
-  Log the_log(0);
+  Log the_log(LOG_ENABLE);
   UsedMemory used_memory(the_log);
+  Arguments arguments = parse_arguments(argc, argv);
+  ;
 
-  std::string filename = "data.txt";
-  for (int i = 1; i < argc; ++i) {
-    if (std::string(argv[i]) == "input") {
-      filename = argv[i + 1];
-    }
-  }
+  std::cout << arguments.filename << " " << arguments.threshold << "\n";
 
-  float threshold = 0.1;
   PageContainer page(the_log, &used_memory);
-  std::ifstream in(filename);
-  page.Load(in, threshold);
+  std::ifstream in(arguments.filename);
+  page.Load(in, arguments.threshold);
 
-  the_log.Write(std::to_string(used_memory.used()));
+  the_log.Write(std::to_string(used_memory.get_used()));
 
   for (size_t i = 0; i < 5; ++i) {
     const auto& item = page.ByIndex(i);
@@ -27,8 +22,8 @@ int main(int argc, char* argv[]) {
     std::cout << item2.name << ": " << item2.score << std::endl;
   }
 
-  page.Reload(threshold);
-  the_log.Write(std::to_string(used_memory.used()));
+  page.Reload(arguments.threshold);
+  the_log.Write(std::to_string(used_memory.get_used()));
 
   return 0;
 }
